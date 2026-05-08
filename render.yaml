@@ -1,0 +1,58 @@
+# Render Blueprint — provisions the ZentoMart backend as a Web Service.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# After connecting this repo to Render, the dashboard will detect this file
+# and offer to create the service. Secret values (sync: false) must be filled
+# in via the Render UI on first deploy — they are NOT read from this file.
+
+services:
+  - type: web
+    name: zentomart-api
+    runtime: node
+    plan: free            # bump to "starter" ($7/mo) to avoid 15-min idle spin-down
+    region: frankfurt     # change if your users / Atlas cluster live elsewhere
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: COOKIE_NAME
+        value: zentomart_token
+
+      # JWT secret — auto-generated once and reused on subsequent deploys.
+      - key: JWT_SECRET
+        generateValue: true
+
+      # Secrets — set these in the Render dashboard before first deploy.
+      - key: MONGO_URI
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false        # e.g. https://zentomart-admin.vercel.app,https://zentomart.vercel.app
+      - key: IMAGEKIT_PUBLIC_KEY
+        sync: false
+      - key: IMAGEKIT_PRIVATE_KEY
+        sync: false
+      - key: IMAGEKIT_URL_ENDPOINT
+        sync: false
+      - key: IMAGEKIT_ID
+        sync: false
+
+      # Seed-script credentials — only needed if you run `npm run seed:*`
+      # against the deployed instance. Safe to omit otherwise.
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_ADMIN_PASSWORD
+        sync: false
+      - key: SEED_ADMIN_NAME
+        sync: false
+      - key: SEED_MANAGER_EMAIL
+        sync: false
+      - key: SEED_MANAGER_PASSWORD
+        sync: false
+      - key: SEED_MANAGER_NAME
+        sync: false
