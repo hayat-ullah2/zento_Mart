@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import {
@@ -17,6 +17,8 @@ export const cartIconRef = { current: null };
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentUrl = location.pathname + (location.search || "");
   const { itemCount } = useCart();
   const { count: wishlistCount } = useWishlist();
   const [searchOpen, setSearchOpen] = useState(false);
@@ -59,7 +61,21 @@ const Navbar = () => {
     setSearchQuery("");
   };
 
-  const navLink = "relative px-1 py-2 text-sm font-medium tracking-wide hover:text-rosegold transition-colors";
+  // `text-cream visited:text-cream` overrides the browser's default visited-link
+  // color so already-clicked links don't appear dimmed. The active link gets a
+  // rose-gold underline drawn with an absolutely-positioned ::after pseudo.
+  const isActive = (to) => {
+    if (to === "/") return location.pathname === "/";
+    return currentUrl === to;
+  };
+  const navLink = (to) => {
+    const base =
+      "relative px-1 py-2 text-sm font-medium tracking-wide text-cream visited:text-cream hover:text-rosegold transition-colors";
+    const active = isActive(to)
+      ? " text-rosegold-light visited:text-rosegold-light after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-[2px] after:bg-rosegold-light after:rounded-full"
+      : "";
+    return base + active;
+  };
 
   return (
     <>
@@ -97,19 +113,19 @@ const Navbar = () => {
 
             {/* Desktop nav */}
             <div className="hidden lg:flex items-center gap-8 text-cream">
-              <Link to="/" className={navLink}>
+              <Link to="/" className={navLink("/")}>
                 Home
               </Link>
-              <Link to="/products" className={navLink}>
+              <Link to="/products" className={navLink("/products")}>
                 Shop All
               </Link>
-              <Link to="/products?style=Tote" className={navLink}>
+              <Link to="/products?style=Tote" className={navLink("/products?style=Tote")}>
                 Totes
               </Link>
-              <Link to="/products?style=Crossbody" className={navLink}>
+              <Link to="/products?style=Crossbody" className={navLink("/products?style=Crossbody")}>
                 Crossbody
               </Link>
-              <Link to="/products?style=Clutch" className={navLink}>
+              <Link to="/products?style=Clutch" className={navLink("/products?style=Clutch")}>
                 Clutches
               </Link>
             </div>
@@ -218,35 +234,35 @@ const Navbar = () => {
                 <CloseIcon className="w-6 h-6" />
               </button>
             </div>
-            <div className="p-5 flex flex-col gap-4 text-charcoal">
-              <Link to="/" onClick={() => setMobileOpen(false)} className="py-2 border-b border-rosegold/10">
-                Home
-              </Link>
-              <Link to="/products" onClick={() => setMobileOpen(false)} className="py-2 border-b border-rosegold/10">
-                Shop All
-              </Link>
+            <div className="p-5 flex flex-col gap-4">
+              {[
+                { to: "/", label: "Home" },
+                { to: "/products", label: "Shop All" },
+                { to: "/products?style=Tote", label: "Totes" },
+                { to: "/products?style=Crossbody", label: "Crossbody" },
+                { to: "/products?style=Clutch", label: "Clutches" },
+              ].map((item) => {
+                const active = isActive(item.to);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileOpen(false)}
+                    className={`py-2 border-b border-rosegold/10 text-cream visited:text-cream hover:text-rosegold-light transition-colors ${
+                      active ? "text-rosegold-light visited:text-rosegold-light font-semibold underline underline-offset-4 decoration-rosegold-light decoration-2" : ""
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
               <Link
-                to="/products?style=Tote"
+                to="/wishlist"
                 onClick={() => setMobileOpen(false)}
-                className="py-2 border-b border-rosegold/10"
+                className={`py-2 text-cream visited:text-cream hover:text-rosegold-light transition-colors ${
+                  isActive("/wishlist") ? "text-rosegold-light visited:text-rosegold-light font-semibold underline underline-offset-4 decoration-rosegold-light decoration-2" : ""
+                }`}
               >
-                Totes
-              </Link>
-              <Link
-                to="/products?style=Crossbody"
-                onClick={() => setMobileOpen(false)}
-                className="py-2 border-b border-rosegold/10"
-              >
-                Crossbody
-              </Link>
-              <Link
-                to="/products?style=Clutch"
-                onClick={() => setMobileOpen(false)}
-                className="py-2 border-b border-rosegold/10"
-              >
-                Clutches
-              </Link>
-              <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="py-2">
                 Wishlist
               </Link>
             </div>
