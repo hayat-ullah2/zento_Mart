@@ -22,6 +22,12 @@ import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 const app = express();
 
+// Render (and most PaaS) put a reverse proxy in front of the app and forward
+// the real client IP via X-Forwarded-For. Trust the first hop so that
+// req.ip / express-rate-limit see the real client, not the proxy.
+// `1` = trust exactly one proxy hop, which is correct for Render/Vercel/Heroku.
+app.set("trust proxy", 1);
+
 // --- Security & body parsing ----------------------------------------------
 // helmet — relaxed `crossOriginResourcePolicy` so uploaded images can render in <img> from another origin
 app.use(
