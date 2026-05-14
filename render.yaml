@@ -33,13 +33,11 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false        # e.g. https://zentomart-admin.vercel.app,https://zentomart.vercel.app
-      - key: IMAGEKIT_PUBLIC_KEY
+      - key: CLOUDINARY_CLOUD_NAME
         sync: false
-      - key: IMAGEKIT_PRIVATE_KEY
+      - key: CLOUDINARY_API_KEY
         sync: false
-      - key: IMAGEKIT_URL_ENDPOINT
-        sync: false
-      - key: IMAGEKIT_ID
+      - key: CLOUDINARY_API_SECRET
         sync: false
 
       # Seed-script credentials — only needed if you run `npm run seed:*`

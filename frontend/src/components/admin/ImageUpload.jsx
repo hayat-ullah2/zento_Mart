@@ -6,11 +6,9 @@ import {
   PlusAdminIcon,
 } from "./AdminIcons";
 
-const IMAGEKIT_URL_ENDPOINT =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_IMAGEKIT_URL_ENDPOINT) || "";
-
 // Resolve a URL like "/uploads/abc.jpg" against the API origin so the <img>
-// works regardless of which port the frontend is on.
+// works regardless of which port the frontend is on. Cloudinary returns full
+// https://res.cloudinary.com/... URLs, which short-circuit on the first guard.
 export const resolveImageUrl = (url) => {
   if (!url) return "";
   if (/^(https?:|data:|blob:)/i.test(url)) return url;
@@ -19,9 +17,6 @@ export const resolveImageUrl = (url) => {
       ? new URL(API_BASE).origin
       : window.location.origin;
     return apiOrigin + url;
-  }
-  if (IMAGEKIT_URL_ENDPOINT && url.startsWith("/")) {
-    return `${IMAGEKIT_URL_ENDPOINT.replace(/\/$/, "")}${url}`;
   }
   return url;
 };

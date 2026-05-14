@@ -13,6 +13,8 @@ router.get("/config", getUploadConfig);
 // Single-image upload - field name is "image".
 router.post("/", upload.single("image"), uploadImage);
 
-router.delete("/:filename", deleteUpload);
+// Wildcard so Cloudinary public_ids that contain "/" (e.g. zentomart/products/abc)
+// can be passed in the URL path. Express captures the rest in req.params[0].
+router.delete("/*", deleteUpload);
 
 export default router;

@@ -6,9 +6,6 @@
 export const API_BASE =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) || "/api";
 
-export const IMAGEKIT_URL_ENDPOINT =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_IMAGEKIT_URL_ENDPOINT) || "";
-
 const TOKEN_KEY = "zentomart_token";
 
 export const tokenStore = {
@@ -76,6 +73,8 @@ export const api = {
 
 // Resolves a server-relative image URL like "/uploads/abc.jpg" against the
 // API origin so <img> works regardless of which port the frontend runs on.
+// Cloudinary uploads return absolute URLs (https://res.cloudinary.com/...),
+// so they pass through the first guard untouched.
 export const resolveAssetUrl = (url) => {
   if (!url) return "";
   if (/^(https?:|data:|blob:)/i.test(url)) return url;
@@ -84,9 +83,6 @@ export const resolveAssetUrl = (url) => {
       ? new URL(API_BASE).origin
       : window.location.origin;
     return apiOrigin + url;
-  }
-  if (IMAGEKIT_URL_ENDPOINT && url.startsWith("/")) {
-    return `${IMAGEKIT_URL_ENDPOINT.replace(/\/$/, "")}${url}`;
   }
   return url;
 };
